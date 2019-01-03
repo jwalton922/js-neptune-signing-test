@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Graphexp, graph explorer</title>
+
+	<head>
+
+		<script src="//code.jquery.com/jquery-3.2.1.min.js"></script>
+		<!--<script src="jquery-3.2.1.min.js"></script>-->
+		<script type="text/javascript" src="bower_components/crypto-js/crypto-js.js"></script>
+		<script src="scripts/josh_utils.js"></script>
+
+	</head>
+
+	<body>
+
+		<div class="container">
+			<div class="nav inputs_container_top">
+				<div class="nav input_unit_container">
+					<label class="nav input_label" for="server_address">Server Address:</label>
+					<input style="width:600px;" name="server_address" id="server_address" value="dev-de-joshtest-wss-cluster.cluster-cqpdxjaydk1j.us-east-1.neptune.amazonaws.com" />
+				</div>
+				<div class="nav input_unit_container">
+					<label class="nav input_label" for="server_port">Server port:</label>
+					<input name="server_port" id="server_port" type="number" value="8182" />
+				</div>				
+						
+
+
+				
+
+				<div class="nav">						
+					<div class="nav input_unit_container ">
+						<label class="nav input_label " for="aws_iam ">Key:</label>
+						<input style="width:600px;" type="text" id="aws_key" />
+					</div>
+					<div class="nav input_unit_container ">
+						<label class="nav input_label " for="aws_iam ">Secret:</label>
+						<input style="width:600px;" name="aws_secret " id="aws_secret" />
+					</div>	
+					<div class="nav input_unit_container ">
+						<label class="nav input_label " for="aws_iam ">Session:</label>
+						<input style="width:600px;" name="session " id="aws_session"  />
+					</div>	
+					<div class="nav input_unit_container ">
+						<button onclick="JoshUtils.performTest()">Perform HTTP GET Test</button>
+						<br />
+						<button onclick="JoshUtils.performWSTest()">Perform WS Test</button>
+					</div>
+				</div>
+		</div>
+			
+		</div>
+		<div class="content">			
+			<div>
+				<h1>HTTP GET Results</h1>
+				<p id="startGetTest">Enter Neptune Info and Hit "Perform HTTP GET Test"</p>
+				<p style="display:none;" id="loadingGetResults">
+					Loading...
+				</p>
+			</div>
+			<div>
+				<h1>HTTP WS Results</h1>
+				<p id="startWsTest">Enter Neptune Info and Hit "Perform WS Test"</p>
+				<p style="display:none;" id="loadingWsResults">
+					Opening...
+				</p>
+			</div>
+		</div>
+		<div class="footer">
+			
+		</div>		
+		<script>
+		</script>
+	</body>
+</html>
