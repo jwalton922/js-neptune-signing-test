@@ -144,7 +144,9 @@ JoshUtils.makeSignedQueryRequest = function () {
     var signature = "" + CryptoJS.HmacSHA256(stringToSign, signingKey);
     var authorizationHeaderValue = algorithm + ' Credential=' + key + '/' + credentialScope + ', SignedHeaders=' + signedHeaders + ', Signature=' + signature;
     console.log("Authorization header value: " + authorizationHeaderValue);
-    var serverUrl = 'http://' + server + '/gremlin/';
+    var webProtocol = location.protocol === 'https:'? 'https:': 'http:';
+	
+    var serverUrl = webProtocol+'//' + server + '/gremlin/';
     var headers = {};
     headers['Authorization'] = authorizationHeaderValue;
     headers['X-Amz-Date'] = datetime;
@@ -264,7 +266,8 @@ JoshUtils.createWebsocketUrl = function () {
         '&X-Amz-Security-Token=' + encodeURIComponent(sessionToken) +
         '&X-Amz-SignedHeaders=' + signedHeaders +
         '&X-Amz-Signature=' + signature;
-    var url = 'ws://' + server + '/gremlin/?' + queryString;
+        var wsProtocol = location.protocol === 'https:'? 'wss:': 'ws:';
+    var url = wsProtocol+'//' + server + '/gremlin/?' + queryString;
     console.log("URL length: " + url.length);
     JoshUtils.run_websocket_request("g.V().count()", url, 'query', null, 'some message', function (data) {
         console.log("Callback of run_websoeckt_request", data);
