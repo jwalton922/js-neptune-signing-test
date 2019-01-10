@@ -49,6 +49,8 @@
 						<button onclick="JoshUtils.performTest()">Perform HTTP GET Test</button>
 						<br />
 						<button onclick="JoshUtils.performWSTest()">Perform WS Test</button>
+                                                <br />
+                                                <button onclick="JoshUtils.performStatusTest()">Perform Status Route Test</button>
 					</div>
 				</div>
 		</div>
@@ -67,6 +69,13 @@
 				<p id="startWsTest">Enter Neptune Info and Hit "Perform WS Test"</p>
 				<p style="display:none;" id="loadingWsResults">
 					Opening...
+				</p>
+			</div>
+                    <div>
+				<h1>HTTP Status Results</h1>
+				<p id="startStatusTest">Enter Neptune Info and Hit "Perform Status Test"</p>
+				<p style="display:none;" id="loadingStatusResults">
+					Loading...
 				</p>
 			</div>
 		</div>

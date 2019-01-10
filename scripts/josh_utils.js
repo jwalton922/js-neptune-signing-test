@@ -35,6 +35,32 @@ JoshUtils.createCanonicalRequestTest = function () {
     return hashOfCanonicalRequest;
 }
 
+JoshUtils.createStatusCanonicalRequest = function (date, signedHeaders, server) {
+    var method = 'GET';
+
+
+    var canonicalUri = '/status/';
+
+
+    var canonicalHeaders = 'host:' + server + '\n'
+        + 'x-amz-date:' + date + '\n';
+
+
+    var payload = '';
+    var hashedPayload = CryptoJS.SHA256(payload);
+    console.log("Hashed Payload: " + hashedPayload);
+    var canonincalRequest = method + '\n'
+        + canonicalUri + '\n'
+        + '\n'
+        + canonicalHeaders + '\n'
+        + signedHeaders + '\n'
+        + hashedPayload;
+
+    console.log("Canonical Request", canonincalRequest);
+    var hashOfCanonicalRequest = "" + CryptoJS.SHA256(canonincalRequest);
+    console.log("Hashed canonical request: " + hashOfCanonicalRequest);
+    return hashOfCanonicalRequest;
+}
 JoshUtils.createCanonicalRequest = function (date, signedHeaders, server, canonicalQueryString) {
     var method = 'GET';
 
@@ -138,7 +164,7 @@ JoshUtils.makeSignedQueryRequest = function () {
     console.log("Date: " + date + " DateTime: " + datetime);
     console.log("Region: " + region + " service: " + service);
     console.log("SignedHeaders: " + signedHeaders);
-    var hashOfCanonicalRequest = JoshUtils.createCanonicalRequest(datetime, signedHeaders, server, canonicalQueryString);
+    var hashOfCanonicalRequest = JoshUtils.createCanonicalRequest(datetime, signedHeaders, server, canonicalQueryString);    
     var stringToSign = JoshUtils.createStringToSign(algorithm, datetime, credentialScope, hashOfCanonicalRequest, region, service);
     var signingKey = JoshUtils.getSignatureKey(secret, date, region, service);
     var signature = "" + CryptoJS.HmacSHA256(stringToSign, signingKey);
@@ -289,6 +315,71 @@ JoshUtils.performTest = function () {
     JoshUtils.makeSignedQueryRequest();    
 };
 
+
+JoshUtils.makeStatusSignedQueryRequest = function () {
+    JoshUtils.readVariables();
+    var server = JoshUtils.server;
+    console.log("Server is: "+server);
+    var algorithm = 'AWS4-HMAC-SHA256';
+    var key = JoshUtils.key;
+    var secret = JoshUtils.secret;
+    var sessionToken = JoshUtils.sessionToken;
+    console.log("Key: "+key);
+    console.log("Secret: "+secret);
+    console.log("Session token: "+sessionToken);
+    var datetime = (new Date()).toISOString().replace(/[:\-]|\.\d{3}/g, '');
+    var date = datetime.substr(0, 8);
+    var region = 'us-east-1';
+    var service = 'neptune-db';
+    var credentialScope = date + '/' + region + '/' + service + '/aws4_request';
+    var signedHeaders = 'host;x-amz-date';
+        
+    console.log("credential scope: " + credentialScope);
+    console.log("Date: " + date + " DateTime: " + datetime);
+    console.log("Region: " + region + " service: " + service);
+    console.log("SignedHeaders: " + signedHeaders);
+    var hashOfCanonicalRequest = JoshUtils.createStatusCanonicalRequest(datetime, signedHeaders, server);    
+    var stringToSign = JoshUtils.createStringToSign(algorithm, datetime, credentialScope, hashOfCanonicalRequest, region, service);
+    var signingKey = JoshUtils.getSignatureKey(secret, date, region, service);
+    var signature = "" + CryptoJS.HmacSHA256(stringToSign, signingKey);
+    var authorizationHeaderValue = algorithm + ' Credential=' + key + '/' + credentialScope + ', SignedHeaders=' + signedHeaders + ', Signature=' + signature;
+    console.log("Authorization header value: " + authorizationHeaderValue);
+    var webProtocol = location.protocol === 'https:'? 'https:': 'http:';
+	
+    var serverUrl = webProtocol+'//' + server + '/status/';
+    var headers = {};
+    headers['Authorization'] = authorizationHeaderValue;
+    headers['X-Amz-Date'] = datetime;
+    headers['X-Amz-Security-Token'] = sessionToken;
+    // headers['origin'] = 'localhost';
+    // headers['host'] = server;
+    console.log("Server url: " + serverUrl);
+    $.ajax({
+        type: "GET",
+        accept: "application/json",
+        //contentType:"application/json; charset=utf-8",
+        url: serverUrl,        
+        headers: headers,
+        timeout: 30000,
+        success: function (data, textStatus, jqXHR) {
+            var Data = data;
+            console.log(Data);
+            console.log("Results received");
+            $("#loadingStatusResults").show();
+            $("#startStatusTest").hide();
+            $("#loadingStatusResults").text("Success!: "+JSON.stringify(Data));
+        },
+        error: function (result, status, error) {
+            console.log("Connection failed. " + status);
+            console.log("Error", error);
+            console.log("Error result", result);
+            $("#loadingStatusResults").show();
+            $("#startStatusTest").hide();
+            $("#loadingStatusResults").text("Error! Check console for more details.");
+        }
+    });
+}
+
 JoshUtils.performWSTest = function () {
     JoshUtils.readVariables();
     console.log("Making websocket request");
@@ -297,6 +388,16 @@ JoshUtils.performWSTest = function () {
     $("#loadingWsResults").text("Opening websocket connection..."); 
     JoshUtils.createWebsocketUrl();
 };
+
+JoshUtils.performStatusTest = function () {
+    JoshUtils.readVariables();
+    console.log("Making signed status request");
+    $("#startStatusTest").hide();
+    $("#loadingStatusResults").show();    
+    JoshUtils.makeStatusSignedQueryRequest();    
+};
+
+
 
 
 
